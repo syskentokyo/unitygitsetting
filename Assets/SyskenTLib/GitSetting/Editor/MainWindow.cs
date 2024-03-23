@@ -18,6 +18,7 @@ namespace SyskenTLib.GitSetting.Editor
             private GitLargeFileManager _gitLargeFileManager = new GitLargeFileManager();
 
             private ResultConfigData _currentLFSExtConfigData = null;
+            private ResultConfigData _currentLFSNameConfigData = null;
             
         [MenuItem("SyskenTLib/GitSetting/Main", priority = 1)]
         private static void ShowWindow()
@@ -152,17 +153,49 @@ namespace SyskenTLib.GitSetting.Editor
             
             EditorGUILayout.LabelField("Individual File Extension");
             EditorGUILayout.LabelField("EX: target1.png");
-            if (GUILayout.Button("Add GitLFS"
-                        , GUILayout.MinWidth(100), GUILayout.MinHeight(30),
-                        GUILayout.MaxWidth(300), GUILayout.MaxHeight(30)))
+ if (GUILayout.Button("1:Search"
+                    ,GUILayout.MinWidth( 100 ),GUILayout.MinHeight( 30 ),
+                    GUILayout.MaxWidth( 300 ),GUILayout.MaxHeight( 30 ) ))
             {
                     AssetDatabase.Refresh();
+
+                    _currentLFSNameConfigData = _gitLargeFileManager.SearchLFSLargeFileName();
+                    _currentlogOutTxt = "検索のみの結果\n";
+                    _currentlogOutTxt += "GitLF設定します。\n";
+                    _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath+"\n";
+                    _currentlogOutTxt += "\n\n";
+                    _currentlogOutTxt += "設定内容:\n";
+                    _currentlogOutTxt += _currentLFSNameConfigData.targetConfigContent+"\n";
                     
+                    _currentlogOutTxt += "古い設定内容:\n";
+                    _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent+"\n";
+                    
+                    AssetDatabase.SaveAssets();;
+            }
+            if (GUILayout.Button("2:Write"
+                        ,GUILayout.MinWidth( 100 ),GUILayout.MinHeight( 30 ),
+                        GUILayout.MaxWidth( 300 ),GUILayout.MaxHeight( 30 ) ))
+            {
+                    AssetDatabase.Refresh();
+
+                    if (_currentLFSNameConfigData != null)
+                    {
+                            
+                            _gitLargeFileManager.WriteLFSConfig(_currentLFSNameConfigData);
+                            _currentlogOutTxt = "";
+                            _currentlogOutTxt += "GitLF設定します。\n";
+                            _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath + "\n";
+                            _currentlogOutTxt += "\n\n";
+                            _currentlogOutTxt += "設定内容:\n";
+                            _currentlogOutTxt += _currentLFSNameConfigData.targetConfigContent + "\n";
+
+                            _currentlogOutTxt += "古い設定内容:\n";
+                            _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent + "\n";
+                            _currentLFSNameConfigData = null;
+                    }
 
                     AssetDatabase.SaveAssets();;
             }
-
-            EditorGUILayout.Space(30);
     
             _scroll2 = EditorGUILayout.BeginScrollView(_scroll2,GUILayout.Height(200));
             EditorGUILayout.TextArea(_currentlogOutTxt, GUILayout.Height(10000));

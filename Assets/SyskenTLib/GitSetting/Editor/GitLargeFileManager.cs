@@ -28,6 +28,7 @@ namespace SyskenTLib.GitSetting.Editor
 
             if (resultData.selectDirectoryPath == "")
             {
+                //何も選択しなかった場合
                 return new ResultConfigData();
             }
 
@@ -41,11 +42,9 @@ namespace SyskenTLib.GitSetting.Editor
             {
                 string ext = Path.GetExtension(filePath);
 
-                if (extDic.ContainsKey(ext) == false)
-                {
-                    //新しい拡張子だったとき
-                    extDic.Add(ext,ext);
-                }
+                //新しい拡張子だった場合のみ追加
+                extDic.TryAdd(ext, ext);
+                
             });
 
             string addConfigTxt = "";
@@ -60,53 +59,23 @@ namespace SyskenTLib.GitSetting.Editor
             //
             // 既存設定ファイル読み込み
             //
-            string oldConfigTxt = "";
             string saveFilePath = selectRootDirectory +"/"+ saveFileName;
-            if (File.Exists(saveFilePath) == true)
-            {
-                //ファイルがあった場合
-                oldConfigTxt = File.ReadAllText(saveFilePath);
-            }
-            // Debug.Log("既存設定内容："+oldConfigTxt);
+            string oldConfigTxt = ReadOldConfig(saveFilePath);
             
-
             //新しい設定内容
             string totalConfigTxt = oldConfigTxt +"\n"+ addConfigTxt;
             List<string> totalConfigSplitTxtList = totalConfigTxt.Split("\n").ToList();//1行づつわける
             
-            //
-            // 設定の重複業の削除
-            //
-            Dictionary<string, string> validConfigTxtDic = new Dictionary<string, string>();
-            totalConfigSplitTxtList.ForEach(oneConfigTxt =>
-            {
-                if (validConfigTxtDic.ContainsKey(oneConfigTxt) == false)
-                {
-                    //新規設定だった場合
-                    validConfigTxtDic.Add(oneConfigTxt,oneConfigTxt);
-                }
-            });
+            //設定の無駄な行を削除
+            string newConfigTxt = DeleteUselessLineFromConfigTxt(totalConfigSplitTxtList);
             
             
             //
             // 新しい設定を書き込み
             //
-            if (validConfigTxtDic.Keys.Count > 0)
+            if (string.IsNullOrEmpty(newConfigTxt)== false)
             {
-                string newConfigTxt = "";
-                validConfigTxtDic.Keys.ToList().ForEach(key =>
-                {
-                    if (key == "\n")
-                    {
-                        //意図しない設定行だった場合
-                    }
-                    else
-                    {
-                        //正しい設定内容だった場合
-                        newConfigTxt += key+"\n";   
-                    }
-                });
-
+                
                 ResultConfigData resultConfigData = new ResultConfigData();
                 resultConfigData.oldConfigContent = oldConfigTxt;
                 resultConfigData.targetConfigPath = saveFilePath;
@@ -116,6 +85,79 @@ namespace SyskenTLib.GitSetting.Editor
             
             return new ResultConfigData();
         }
+        
+         public ResultConfigData SearchLFSLargeFileName()
+        {
+            ConfigManager _configManager = new ConfigManager();
+            STGitConfig config = _configManager.SearchConfig();
+
+            string saveFileName = config.GetGitAttributeFileName;
+            float limitLargeFileSizeMB = config.GetLargeFileSizeMB;
+            string gitLFSParam = config.GetGitLfsAttributeParam1;//GITLFSの１行毎のパラメータ
+            
+            SearchResultData resultData= SearchFilePathLFSLargeFile(limitLargeFileSizeMB);
+
+            if (resultData.selectDirectoryPath == "")
+            {
+                //何も選択しなかった場合
+                return new ResultConfigData();
+            }
+
+            string selectRootDirectory = resultData.selectDirectoryPath;
+            
+
+            List<string> targetFileList = new List<string>();
+            //
+            // ファイル名を指定して、LFS対象にする
+            //
+            resultData.resultPathList.ForEach(filePath =>
+            {
+                string validFilePath = filePath.Replace(selectRootDirectory+"/", "");
+
+                //新しいファイルだった場合のみ追加
+                targetFileList.Add(validFilePath);
+                
+            });
+
+            string addConfigTxt = "";
+            //
+            // 新しく追加したい設定
+            //
+            targetFileList.ForEach(filePath =>
+            {
+                addConfigTxt += "\""+ filePath + "\"  " + gitLFSParam + "\n";
+            });
+            
+            //
+            // 既存設定ファイル読み込み
+            //
+            string saveFilePath = selectRootDirectory +"/"+ saveFileName;
+            string oldConfigTxt = ReadOldConfig(saveFilePath);
+            
+            //新しい設定内容
+            string totalConfigTxt = oldConfigTxt +"\n"+ addConfigTxt;
+            List<string> totalConfigSplitTxtList = totalConfigTxt.Split("\n").ToList();//1行づつわける
+            
+            //設定の無駄な行を削除
+            string newConfigTxt = DeleteUselessLineFromConfigTxt(totalConfigSplitTxtList);
+            
+            
+            //
+            // 新しい設定を書き込み
+            //
+            if (string.IsNullOrEmpty(newConfigTxt)== false)
+            {
+                
+                ResultConfigData resultConfigData = new ResultConfigData();
+                resultConfigData.oldConfigContent = oldConfigTxt;
+                resultConfigData.targetConfigPath = saveFilePath;
+                resultConfigData.targetConfigContent = newConfigTxt;
+                return resultConfigData;
+            }
+            
+            return new ResultConfigData();
+        }
+
 
         public void WriteLFSConfig(ResultConfigData targetConfigData)
         {
@@ -201,6 +243,62 @@ namespace SyskenTLib.GitSetting.Editor
 
             return resultData;
         }
+
+        private string ReadOldConfig(string saveFilePath)
+        {
+            string oldConfigTxt = "";
+            if (File.Exists(saveFilePath) == true)
+            {
+                //ファイルがあった場合
+                oldConfigTxt = File.ReadAllText(saveFilePath);
+            }
+
+            return oldConfigTxt;
+        }
+
+        /// <summary>
+        /// 設定内容から無駄なものを削除する
+        /// </summary>
+        /// <param name="validConfigTxtDic"></param>
+        /// <returns></returns>
+        private string DeleteUselessLineFromConfigTxt(  List<string> totalConfigSplitTxtList )
+        {
+            
+            //
+            // 重複行の削除
+            //
+            Dictionary<string, string> validConfigTxtDic = new Dictionary<string, string>();
+            totalConfigSplitTxtList.ForEach(oneConfigTxt =>
+            {
+                if (validConfigTxtDic.ContainsKey(oneConfigTxt) == false)
+                {
+                    //新規設定だった場合
+                    validConfigTxtDic.Add(oneConfigTxt,oneConfigTxt);
+                }
+            });
+            
+            
+            //
+            // その他の無駄な行を削除
+            //
+            string newConfigTxt = "";
+            validConfigTxtDic.Keys.ToList().ForEach(key =>
+            {
+                if (key == "\n")
+                {
+                    //意図しない設定行だった場合
+                }
+                else
+                {
+                    //正しい設定内容だった場合
+                    newConfigTxt += key+"\n";   
+                }
+            });
+
+            return newConfigTxt;
+        }
+        
+        
 
     }
 }
