@@ -41,6 +41,7 @@ namespace SyskenTLib.GitSetting.Editor
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("Base");
 
+            EditorGUILayout.BeginHorizontal("Box");
             if (GUILayout.Button("Create GitIgnore"
                     ,GUILayout.MinWidth( 100 ),GUILayout.MinHeight( 30 ),
                     GUILayout.MaxWidth( 300 ),GUILayout.MaxHeight( 30 ) ))
@@ -54,7 +55,7 @@ namespace SyskenTLib.GitSetting.Editor
             {
                     _baseManager.CreateGitLFSConfig();;
             }
-            
+            EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.EndVertical();
             EditorGUILayout.BeginVertical("Box");
@@ -100,6 +101,9 @@ namespace SyskenTLib.GitSetting.Editor
             
             EditorGUILayout.Space(4);
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginHorizontal("Box");
+            
             EditorGUILayout.BeginVertical("Box");
 
             EditorGUILayout.LabelField("Git LFS");
@@ -128,10 +132,10 @@ namespace SyskenTLib.GitSetting.Editor
                     _currentlogOutTxt += "GitLFS設定します。\n";
                     _currentlogOutTxt += _currentLFSExtConfigData.targetConfigPath+"\n";
                     _currentlogOutTxt += "\n\n";
-                    _currentlogOutTxt += "設定内容:\n";
+                    _currentlogOutTxt += "New Config:\n";
                     _currentlogOutTxt += _currentLFSExtConfigData.targetConfigContent+"\n";
                     
-                    _currentlogOutTxt += "古い設定内容:\n";
+                    _currentlogOutTxt += "Old Config:\n";
                     _currentlogOutTxt += _currentLFSExtConfigData.oldConfigContent+"\n";
                     
                     //スクロールリセット
@@ -163,10 +167,10 @@ namespace SyskenTLib.GitSetting.Editor
                             _currentlogOutTxt += "GitLF設定します。\n";
                             _currentlogOutTxt += _currentLFSExtConfigData.targetConfigPath + "\n";
                             _currentlogOutTxt += "\n\n";
-                            _currentlogOutTxt += "設定内容:\n";
+                            _currentlogOutTxt += "New Config:\n";
                             _currentlogOutTxt += _currentLFSExtConfigData.targetConfigContent + "\n";
 
-                            _currentlogOutTxt += "古い設定内容:\n";
+                            _currentlogOutTxt += "Old Config:\n";
                             _currentlogOutTxt += _currentLFSExtConfigData.oldConfigContent + "\n";
                             _currentLFSExtConfigData = null;
                             
@@ -180,7 +184,10 @@ namespace SyskenTLib.GitSetting.Editor
             }
             EditorGUILayout.Space(30);
             
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.BeginVertical("Box");
             
+            EditorGUILayout.LabelField("");
             EditorGUILayout.LabelField("Individual File Extension");
             EditorGUILayout.LabelField("EX: target1.png");
  if (GUILayout.Button("1:Search"
@@ -205,10 +212,10 @@ namespace SyskenTLib.GitSetting.Editor
                     _currentlogOutTxt += "GitLF設定します。\n";
                     _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath+"\n";
                     _currentlogOutTxt += "\n\n";
-                    _currentlogOutTxt += "設定内容:\n";
+                    _currentlogOutTxt += "New Config:\n";
                     _currentlogOutTxt += _currentLFSNameConfigData.targetConfigContent+"\n";
                     
-                    _currentlogOutTxt += "古い設定内容:\n";
+                    _currentlogOutTxt += "Old Config:\n";
                     _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent+"\n";
                     
                                         
@@ -242,10 +249,10 @@ namespace SyskenTLib.GitSetting.Editor
                             _currentlogOutTxt += "GitLF設定します。\n";
                             _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath + "\n";
                             _currentlogOutTxt += "\n\n";
-                            _currentlogOutTxt += "設定内容:\n";
+                            _currentlogOutTxt += "New Config:\n";
                             _currentlogOutTxt += _currentLFSNameConfigData.targetConfigContent + "\n";
 
-                            _currentlogOutTxt += "古い設定内容:\n";
+                            _currentlogOutTxt += "Old Config:\n";
                             _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent + "\n";
                             _currentLFSNameConfigData = null;
                             
@@ -257,12 +264,15 @@ namespace SyskenTLib.GitSetting.Editor
 
                     AssetDatabase.SaveAssets();;
             }
-    
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+            
             _scroll2 = EditorGUILayout.BeginScrollView(_scroll2,GUILayout.Height(400));
             EditorGUILayout.TextArea(_currentlogOutTxt, GUILayout.Height(10000));
             EditorGUILayout.EndScrollView();
             
-            EditorGUILayout.EndVertical();
+            
+            
             EditorGUILayout.Space(30);
           
             
