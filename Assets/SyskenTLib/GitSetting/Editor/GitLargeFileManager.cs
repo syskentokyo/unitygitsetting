@@ -11,6 +11,11 @@ namespace SyskenTLib.GitSetting.Editor
 {
     public class GitLargeFileManager
     {
+
+
+        #region 公開
+
+
         /// <summary>
         /// 拡張子指定して、設定内容をまとめる
         /// </summary>
@@ -68,6 +73,13 @@ namespace SyskenTLib.GitSetting.Editor
             
             //設定の無駄な行を削除
             string newConfigTxt = DeleteUselessLineFromConfigTxt(totalConfigSplitTxtList);
+
+            //古い設定と新しい設定が同じか
+            bool isSameOldAndNew = false;
+            if (oldConfigTxt == newConfigTxt)
+            {
+                isSameOldAndNew = true; 
+            }
             
             
             //
@@ -75,8 +87,8 @@ namespace SyskenTLib.GitSetting.Editor
             //
             if (string.IsNullOrEmpty(newConfigTxt)== false)
             {
-                
                 ResultConfigData resultConfigData = new ResultConfigData();
+                resultConfigData.isSameOldAndNewConfig = isSameOldAndNew;
                 resultConfigData.oldConfigContent = oldConfigTxt;
                 resultConfigData.targetConfigPath = saveFilePath;
                 resultConfigData.targetConfigContent = newConfigTxt;
@@ -141,6 +153,13 @@ namespace SyskenTLib.GitSetting.Editor
             //設定の無駄な行を削除
             string newConfigTxt = DeleteUselessLineFromConfigTxt(totalConfigSplitTxtList);
             
+            //古い設定と新しい設定が同じか
+            bool isSameOldAndNew = false;
+            if (oldConfigTxt == newConfigTxt)
+            {
+                isSameOldAndNew = true; 
+            }
+
             
             //
             // 新しい設定を書き込み
@@ -149,6 +168,7 @@ namespace SyskenTLib.GitSetting.Editor
             {
                 
                 ResultConfigData resultConfigData = new ResultConfigData();
+                resultConfigData.isSameOldAndNewConfig = isSameOldAndNew;
                 resultConfigData.oldConfigContent = oldConfigTxt;
                 resultConfigData.targetConfigPath = saveFilePath;
                 resultConfigData.targetConfigContent = newConfigTxt;
@@ -184,7 +204,12 @@ namespace SyskenTLib.GitSetting.Editor
             File.WriteAllText(targetConfigData.targetConfigPath,targetConfigData.targetConfigContent);
         }
         
+        
 
+        #endregion
+        
+        
+        
         /// <summary>
         /// 指定容量より大きいファイルのリストを返す
         /// </summary>

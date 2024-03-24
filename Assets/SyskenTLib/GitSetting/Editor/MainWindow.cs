@@ -24,7 +24,7 @@ namespace SyskenTLib.GitSetting.Editor
         private static void ShowWindow()
         {
             var window = GetWindow<MainWindow>();
-            window.titleContent = new UnityEngine.GUIContent("MainWindow");
+            window.titleContent = new UnityEngine.GUIContent("GitSetting");
             window.Show();
         }
 
@@ -110,10 +110,22 @@ namespace SyskenTLib.GitSetting.Editor
                     GUILayout.MaxWidth( 300 ),GUILayout.MaxHeight( 30 ) ))
             {
                     AssetDatabase.Refresh();
+                    
+                    
 
                     _currentLFSExtConfigData = _gitLargeFileManager.SearchLFSLargeFileExt();
-                    _currentlogOutTxt = "検索のみの結果\n";
-                    _currentlogOutTxt += "GitLF設定します。\n";
+                    string sameOldAndNewMessage = "";
+                    if (_currentLFSExtConfigData.isSameOldAndNewConfig == true)
+                    {
+                            //同じ設定だった場合
+                            sameOldAndNewMessage = "\n\n設定に変更がありません。\n\n";
+                    }
+                    
+                    
+                    _currentlogOutTxt = "検索のみの結果\n\n";
+                    _currentlogOutTxt += sameOldAndNewMessage;
+                    
+                    _currentlogOutTxt += "GitLFS設定します。\n";
                     _currentlogOutTxt += _currentLFSExtConfigData.targetConfigPath+"\n";
                     _currentlogOutTxt += "\n\n";
                     _currentlogOutTxt += "設定内容:\n";
@@ -121,6 +133,9 @@ namespace SyskenTLib.GitSetting.Editor
                     
                     _currentlogOutTxt += "古い設定内容:\n";
                     _currentlogOutTxt += _currentLFSExtConfigData.oldConfigContent+"\n";
+                    
+                    //スクロールリセット
+                    _scroll2 = Vector2.zero;;
                     
                     AssetDatabase.SaveAssets();;
             }
@@ -134,7 +149,17 @@ namespace SyskenTLib.GitSetting.Editor
                     {
                             
                             _gitLargeFileManager.WriteLFSConfig(_currentLFSExtConfigData);
+                            string sameOldAndNewMessage = "";
+                            if (_currentLFSExtConfigData.isSameOldAndNewConfig == true)
+                            {
+                                    //同じ設定だった場合
+                                    sameOldAndNewMessage = "\n\n設定に変更がありません。\n\n";
+                            }
+                            
+                            
                             _currentlogOutTxt = "";
+                            _currentlogOutTxt += sameOldAndNewMessage;
+                            
                             _currentlogOutTxt += "GitLF設定します。\n";
                             _currentlogOutTxt += _currentLFSExtConfigData.targetConfigPath + "\n";
                             _currentlogOutTxt += "\n\n";
@@ -144,6 +169,11 @@ namespace SyskenTLib.GitSetting.Editor
                             _currentlogOutTxt += "古い設定内容:\n";
                             _currentlogOutTxt += _currentLFSExtConfigData.oldConfigContent + "\n";
                             _currentLFSExtConfigData = null;
+                            
+                                                
+                            //スクロールリセット
+                            _scroll2 = Vector2.zero;;
+
                     }
 
                     AssetDatabase.SaveAssets();;
@@ -158,9 +188,20 @@ namespace SyskenTLib.GitSetting.Editor
                     GUILayout.MaxWidth( 300 ),GUILayout.MaxHeight( 30 ) ))
             {
                     AssetDatabase.Refresh();
+                    
 
                     _currentLFSNameConfigData = _gitLargeFileManager.SearchLFSLargeFileName();
-                    _currentlogOutTxt = "検索のみの結果\n";
+                    string sameOldAndNewMessage = "";
+                    if (_currentLFSNameConfigData.isSameOldAndNewConfig == true)
+                    {
+                            //同じ設定だった場合
+                            sameOldAndNewMessage = "\n\n設定に変更がありません。\n\n";
+                    }
+                    
+                    
+                    _currentlogOutTxt = "検索のみの結果\n\n";
+                    _currentlogOutTxt += sameOldAndNewMessage;
+                    
                     _currentlogOutTxt += "GitLF設定します。\n";
                     _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath+"\n";
                     _currentlogOutTxt += "\n\n";
@@ -169,6 +210,11 @@ namespace SyskenTLib.GitSetting.Editor
                     
                     _currentlogOutTxt += "古い設定内容:\n";
                     _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent+"\n";
+                    
+                                        
+                    //スクロールリセット
+                    _scroll2 = Vector2.zero;;
+
                     
                     AssetDatabase.SaveAssets();;
             }
@@ -180,9 +226,19 @@ namespace SyskenTLib.GitSetting.Editor
 
                     if (_currentLFSNameConfigData != null)
                     {
-                            
+
                             _gitLargeFileManager.WriteLFSConfig(_currentLFSNameConfigData);
+                            string sameOldAndNewMessage = "";
+                            if (_currentLFSNameConfigData.isSameOldAndNewConfig == true)
+                            {
+                                    //同じ設定だった場合
+                                    sameOldAndNewMessage = "\n\n設定に変更がありません。\n\n";
+                            }
+
+                            
                             _currentlogOutTxt = "";
+                            _currentlogOutTxt += sameOldAndNewMessage;
+                            
                             _currentlogOutTxt += "GitLF設定します。\n";
                             _currentlogOutTxt += _currentLFSNameConfigData.targetConfigPath + "\n";
                             _currentlogOutTxt += "\n\n";
@@ -192,12 +248,17 @@ namespace SyskenTLib.GitSetting.Editor
                             _currentlogOutTxt += "古い設定内容:\n";
                             _currentlogOutTxt += _currentLFSNameConfigData.oldConfigContent + "\n";
                             _currentLFSNameConfigData = null;
+                            
+                                                
+                            //スクロールリセット
+                            _scroll2 = Vector2.zero;;
+
                     }
 
                     AssetDatabase.SaveAssets();;
             }
     
-            _scroll2 = EditorGUILayout.BeginScrollView(_scroll2,GUILayout.Height(200));
+            _scroll2 = EditorGUILayout.BeginScrollView(_scroll2,GUILayout.Height(400));
             EditorGUILayout.TextArea(_currentlogOutTxt, GUILayout.Height(10000));
             EditorGUILayout.EndScrollView();
             

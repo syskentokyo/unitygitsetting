@@ -3,3 +3,4 @@
 "New Folder/sample4_2m.abc"   filter=lfs diff=lfs merge=lfs -text
 "New Folder/sample4_2m.bt"   filter=lfs diff=lfs merge=lfs -text
 "New Folder/sample4_2m.byte"   filter=lfs diff=lfs merge=lfs -text
+"New Folder 1/sample4_2m.abc"   filter=lfs diff=lfs merge=lfs -text
